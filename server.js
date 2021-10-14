@@ -11,7 +11,7 @@ const db = mysql.createConnection(
     {
         host: 'localhost',
         user: 'root',
-        password: 'G3tfucked1!',
+        password: 'For@project1!',
         database: 'company'
     },
     console.log('Connected to the company database.')
@@ -117,9 +117,9 @@ const addDeparment = function() {
             return;
         }
         console.table(rows);
+        initialize();
         })
     })
-    initialize();
 };
 
 const addRole = function() {
@@ -174,11 +174,11 @@ const addRole = function() {
                 if(err) {
                     console.log(err);
                 }
-                console.table(rows);         
+                console.table(rows);   
+                initialize();       
             });
         })
-    }) 
-    initialize(); 
+    })  
 };
 
 const addEmployee = function() {
@@ -234,10 +234,10 @@ const addEmployee = function() {
                     console.log(err)
                 }
                 console.table(rows)
+                initialize();
             })
         })
     })
-    initialize();
 };
 
 const updateEmpRole = function() {
@@ -250,48 +250,49 @@ const updateEmpRole = function() {
         for (r in rows) {
             roles.push(rows[r].title);
         }
-    })
-    inquirer
-    .prompt([
-        {
-            type: 'input',
-            message: 'Please enter the employee number you wish to update.',
-            name: 'empNum',
-            validate: numInput => {
-                if(numInput > 0) {
-                    return true;
-                } else {
-                    console.log('Please enter a valid employee number!');
-                    return false;
+        inquirer
+        .prompt([
+            {
+                type: 'input',
+                message: 'Please enter the employee number you wish to update.',
+                name: 'empNum',
+                validate: numInput => {
+                    if(numInput > 0) {
+                        return true;
+                    } else {
+                        console.log('Please enter a valid employee number!');
+                        return false;
+                    }
                 }
+            },
+            {
+                type: 'list',
+                message: 'Please select their new role.',
+                name: 'newRole',
+                choices: roles
             }
-        },
-        {
-            type: 'list',
-            message: 'Please select their new role.',
-            name: 'newRole',
-            choices: roles
-        }
-    ])
-    .then(data => {
-        db.query('SELECT id FROM roles WHERE title = ?', data.newRole, (err, rows) => {
-            if(err) {
-                console.log(err)
-            }
-
-            const newID = rows[0].id;
-            console.log(newID);
-            const params = [newID, data.empNumb]
-            const updateSql = 'UPDATE employees SET role_id = ? WHERE id = ?';
-            db.query(updateSql, params, (err, rows) => {
+        ])
+        .then(data => {
+            db.query('SELECT id FROM roles WHERE title = ?', data.newRole, (err, rows) => {
                 if(err) {
-                    console.log(err);
+                    console.log(err)
                 }
-                console.log(rows);
+    
+                const newID = rows[0].id;
+                console.log(newID);
+                console.log(data.empNumb);
+                const params = [newID, data.empNum]
+                const updateSql = 'UPDATE employees SET role_id = ? WHERE id = ?';
+                db.query(updateSql, params, (err, rows) => {
+                    if(err) {
+                        console.log(err);
+                    }
+                    console.log(rows);
+                    initialize();
+                })
             })
         })
     })
-    initialize();
 }
 
 app.listen(PORT, () => {
